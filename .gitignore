@@ -1,0 +1,67 @@
+# Telegram Scraper .gitignore
+
+# Sensitive configuration
+config/settings.yaml
+.env
+*.session
+*.session-journal
+
+# Data files
+data/exports/*.csv
+data/exports/*.json
+data/exports/*.xlsx
+data/logs/*.log
+data/cache/*
+data/sessions/*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Docker
+.dockerignore

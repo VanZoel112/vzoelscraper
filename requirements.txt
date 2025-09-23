@@ -1,0 +1,117 @@
+# ===== CORE DEPENDENCIES =====
+# Telegram API libraries
+telethon>=1.35.0
+pyrogram>=2.0.0
+
+# Async support
+asyncio-throttle>=1.0.0
+aiofiles>=23.0.0
+aiohttp>=3.9.0
+
+# ===== DATA PROCESSING =====
+# Data manipulation and analysis
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Export formats
+openpyxl>=3.1.0  # Excel support
+xlsxwriter>=3.1.0
+python-docx>=0.8.11
+
+# ===== CONFIGURATION =====
+# Configuration management
+pyyaml>=6.0.0
+python-dotenv>=1.0.0
+configparser>=5.3.0
+
+# ===== UTILITIES =====
+# Date and time
+python-dateutil>=2.8.0
+pytz>=2023.3
+
+# Data validation
+pydantic>=2.0.0
+marshmallow>=3.20.0
+
+# ===== ANALYTICS =====
+# Text processing
+nltk>=3.8.0
+textblob>=0.17.0
+langdetect>=1.0.9
+
+# Statistical analysis
+scipy>=1.11.0
+scikit-learn>=1.3.0
+
+# ===== VISUALIZATION =====
+# Charts and graphs (optional)
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.15.0
+
+# ===== NETWORKING =====
+# HTTP client improvements
+requests>=2.31.0
+httpx>=0.25.0
+urllib3>=2.0.0
+
+# ===== SECURITY =====
+# Encryption and security
+cryptography>=41.0.0
+cryptg>=0.4.0  # Telethon speedup
+
+# ===== LOGGING =====
+# Advanced logging
+loguru>=0.7.0
+colorama>=0.4.6
+
+# ===== PERFORMANCE =====
+# JSON handling
+ujson>=5.0.0
+orjson>=3.9.0
+
+# Caching
+diskcache>=5.6.0
+redis>=4.6.0  # Optional
+
+# ===== CLI =====
+# Command line interface
+click>=8.1.0
+rich>=13.0.0  # Beautiful terminal output
+typer>=0.9.0
+
+# Progress bars
+tqdm>=4.65.0
+
+# ===== DEVELOPMENT =====
+# Code quality (optional)
+black>=23.0.0
+flake8>=6.0.0
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# ===== SYSTEM =====
+# System monitoring
+psutil>=5.9.0
+
+# File handling
+pathlib>=1.0.0
+os-sys>=2.1.4
+
+# ===== WEB INTERFACE (OPTIONAL) =====
+# Web dashboard (uncomment if needed)
+# fastapi>=0.100.0
+# uvicorn>=0.23.0
+# jinja2>=3.1.0
+
+# ===== DATABASE (OPTIONAL) =====
+# Database support (uncomment if needed)
+# sqlalchemy>=2.0.0
+# aiosqlite>=0.19.0
+# asyncpg>=0.28.0  # PostgreSQL
+
+# ===== VERSION INFO =====
+# Telegram Member Scraper SMM v1.0.0
+# Compatible with Python 3.8+
+# Created by VanZoel112
+# Updated: 2025-09-23

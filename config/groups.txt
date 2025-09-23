@@ -1,0 +1,25 @@
+# Sample groups to scrape - One group per line
+# Replace with your target groups
+
+# Cryptocurrency groups
+@cryptogroup
+@bitcointrading
+@ethereumcommunity
+
+# Technology groups
+@pythongroup
+@techsupport
+@programming
+
+# Marketing groups
+@digitalmarketing
+@smmexperts
+@marketingtools
+
+# You can also use invite links:
+# https://t.me/+invite_link_here
+
+# Tips:
+# - Use @ for public groups
+# - Use full invite links for private groups (if you have access)
+# - Remove # to uncomment groups you want to scrape
