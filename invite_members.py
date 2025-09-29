@@ -20,6 +20,11 @@ from telethon import TelegramClient, errors
 from telethon.tl.functions.channels import InviteToChannelRequest
 from telethon.errors import FloodWaitError, UserPrivacyRestrictedError, PeerFloodError
 
+# Import config system
+import sys
+sys.path.append('.')
+from src.utils.config import Config
+
 # Setup logging
 log_dir = Path('data/logs')
 log_dir.mkdir(parents=True, exist_ok=True)
@@ -37,7 +42,8 @@ logger = logging.getLogger(__name__)
 class MemberInviter:
     """Member invitation system for target group"""
 
-    def __init__(self, session_name: str = "scraper_session"):
+    def __init__(self, config_path: str = "config/target_config.yaml", session_name: str = "scraper_session"):
+        self.config = Config(config_path)
         self.session_name = session_name
         self.client = None
         self.target_group = "https://t.me/+3_lpGQGGGeA2NWJl"
@@ -48,9 +54,19 @@ class MemberInviter:
     async def initialize_client(self):
         """Initialize Telegram client"""
         try:
-            # Use existing session from scraper
-            self.client = TelegramClient(f'data/sessions/{self.session_name}',
-                                       api_id=None, api_hash=None)
+            # Use config like the successful scraper
+            api_id = self.config.get('telegram.api_id')
+            api_hash = self.config.get('telegram.api_hash')
+            session_name = self.config.get('telegram.session_name', self.session_name)
+
+            logger.info(f"🔧 Initializing client with session: {session_name}")
+
+            self.client = TelegramClient(
+                session=session_name,
+                api_id=api_id,
+                api_hash=api_hash
+            )
+
             await self.client.start()
 
             me = await self.client.get_me()
@@ -59,6 +75,7 @@ class MemberInviter:
 
         except Exception as e:
             logger.error(f"❌ Failed to initialize client: {e}")
+            logger.error(f"🔧 Config path: {self.config.config_path if hasattr(self.config, 'config_path') else 'Unknown'}")
             return False
 
     async def load_scraped_members(self, export_file: str) -> List[Dict]:
