@@ -33,6 +33,12 @@ pip install python-dotenv>=1.0.0
 echo "📋 Installing all requirements..."
 pip install -r requirements.txt
 
+# Create necessary directories
+echo "📁 Creating required directories..."
+mkdir -p data/logs
+mkdir -p data/exports
+mkdir -p downloads
+
 echo "✅ Installation complete!"
 echo ""
 echo "🎯 To run the scraper:"

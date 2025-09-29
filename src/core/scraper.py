@@ -32,12 +32,15 @@ from ..utils.config import Config
 from ..models.member import Member
 from ..models.group import Group
 
-# Setup logging
+# Setup logging with directory creation
+log_dir = Path('data/logs')
+log_dir.mkdir(parents=True, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('data/logs/scraper.log'),
+        logging.FileHandler(log_dir / 'scraper.log'),
         logging.StreamHandler()
     ]
 )

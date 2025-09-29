@@ -2,6 +2,23 @@
 
 ## Common Installation Issues
 
+### ❌ "FileNotFoundError: data/logs/scraper.log" Error
+
+**Problem**: Getting `FileNotFoundError: [Errno 2] No such file or directory: 'data/logs/scraper.log'`
+
+**Solution**:
+```bash
+# Quick fix - create directories
+mkdir -p data/logs data/exports downloads
+touch data/logs/scraper.log
+
+# Or run the setup script
+chmod +x setup_dirs.sh
+./setup_dirs.sh
+```
+
+**Why**: The scraper needs directory structure that may not exist
+
 ### ❌ "No module named 'yaml'" Error
 
 **Problem**: Getting `ModuleNotFoundError: No module named 'yaml'`
