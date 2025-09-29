@@ -1,0 +1,20 @@
+telegram:
+  api_id: "26576546"
+  api_hash: "d1948cd4d196a991366f762189c4ff3d"
+  session_name: "vzoelscraper"
+
+scraping:
+  delay_between_requests: 1.0
+  max_members_per_group: 10000
+  timeout: 30
+  retry_attempts: 3
+
+export:
+  default_format: "csv"
+  include_photos: false
+  anonymize_data: false
+
+analytics:
+  track_activity: true
+  estimate_demographics: true
+  calculate_engagement: true
