@@ -58,15 +58,59 @@ async def force_export_from_recent_scrape():
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                     group_name = group_url.split('/')[-1].replace('@', '')
 
-                    # CSV Export
+                    # Manual CSV Export (more reliable)
                     csv_file = f"data/exports/force_export_{group_name}_{timestamp}.csv"
-                    await scraper._export_to_csv(members, csv_file)
-                    print(f"💾 CSV: {csv_file}")
+                    try:
+                        import csv
+                        from pathlib import Path
 
-                    # JSON Export
+                        Path(csv_file).parent.mkdir(parents=True, exist_ok=True)
+
+                        # Get fieldnames from member
+                        sample_dict = members[0].to_dict()
+                        fieldnames = list(sample_dict.keys())
+
+                        with open(csv_file, 'w', newline='', encoding='utf-8') as csvfile:
+                            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                            writer.writeheader()
+
+                            for member in members:
+                                member_dict = member.to_dict()
+                                row_data = {field: member_dict.get(field, '') for field in fieldnames}
+                                writer.writerow(row_data)
+
+                        if Path(csv_file).exists():
+                            size = Path(csv_file).stat().st_size
+                            print(f"💾 CSV: {csv_file} ({size} bytes)")
+                        else:
+                            print(f"❌ CSV file not created: {csv_file}")
+
+                    except Exception as csv_error:
+                        print(f"❌ CSV export failed: {csv_error}")
+
+                    # Manual JSON Export (more reliable)
                     json_file = f"data/exports/force_export_{group_name}_{timestamp}.json"
-                    await scraper._export_to_json(members, json_file)
-                    print(f"💾 JSON: {json_file}")
+                    try:
+                        with open(json_file, 'w', encoding='utf-8') as jsonfile:
+                            data = {
+                                'export_info': {
+                                    'timestamp': timestamp,
+                                    'total_members': len(members),
+                                    'scraper_version': '1.0.0',
+                                    'group_url': group_url
+                                },
+                                'members': [member.to_dict() for member in members]
+                            }
+                            json.dump(data, jsonfile, indent=2, ensure_ascii=False, default=str)
+
+                        if Path(json_file).exists():
+                            size = Path(json_file).stat().st_size
+                            print(f"💾 JSON: {json_file} ({size} bytes)")
+                        else:
+                            print(f"❌ JSON file not created: {json_file}")
+
+                    except Exception as json_error:
+                        print(f"❌ JSON export failed: {json_error}")
 
                     # Manual backup
                     backup_file = f"data/exports/manual_backup_{group_name}_{timestamp}.json"
