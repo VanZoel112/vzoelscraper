@@ -1,6 +1,13 @@
 # Configuration for Member Migration Operation
 # Target: https://t.me/+3_lpGQGGGeA2NWJl
 
+# Telegram API Configuration (REQUIRED)
+# Get these from https://my.telegram.org
+telegram:
+  api_id: YOUR_API_ID_HERE  # Replace with your numeric API ID
+  api_hash: "YOUR_API_HASH_HERE"  # Replace with your API Hash string
+  session_name: "scraper_session"  # Session file name
+
 # Target group configuration
 target_group:
   url: "https://t.me/+3_lpGQGGGeA2NWJl"

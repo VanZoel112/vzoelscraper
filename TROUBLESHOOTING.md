@@ -19,6 +19,39 @@ chmod +x setup_dirs.sh
 
 **Why**: The scraper needs directory structure that may not exist
 
+### ❌ "Required configuration field 'telegram.api_id' is missing" Error
+
+**Problem**: Getting `Failed to initialize scraper: Required configuration field 'telegram.api_id' is missing`
+
+**Quick Solution**:
+```bash
+# Use simple config (uses existing session)
+python scraper.py --groups groups.txt --config config/simple_config.yaml
+
+# Or setup API credentials
+chmod +x setup_api.sh
+./setup_api.sh
+```
+
+**Detailed Solution**:
+1. **Get API Credentials**:
+   - Go to https://my.telegram.org
+   - Login with your phone (+6283199218070)
+   - Go to "API development tools"
+   - Create application, copy API ID and Hash
+
+2. **Update Configuration**:
+   ```bash
+   # Edit config file
+   nano config/target_config.yaml
+
+   # Replace:
+   # api_id: YOUR_API_ID_HERE
+   # api_hash: "YOUR_API_HASH_HERE"
+   ```
+
+**Why**: The scraper needs Telegram API credentials for authentication
+
 ### ❌ "No module named 'yaml'" Error
 
 **Problem**: Getting `ModuleNotFoundError: No module named 'yaml'`

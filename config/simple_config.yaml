@@ -1,0 +1,25 @@
+# Simple Configuration for vzoelscraper
+# Uses existing session from previous authentication
+
+# Session configuration
+session:
+  name: "scraper_session"
+  use_existing: true
+
+# Scraping settings
+scraper:
+  max_members_per_group: 500
+  delay_between_requests: 2
+  output_format: "excel"
+
+# Member filtering
+filters:
+  active_only: true
+  exclude_bots: true
+  include_usernames: true
+
+# Export settings
+export:
+  directory: "data/exports"
+  filename_prefix: "members"
+  include_timestamp: true
