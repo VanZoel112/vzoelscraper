@@ -365,11 +365,25 @@ class TelegramMemberScraper:
 
                 # Export group data
                 if members:
-                    await self._export_members(
-                        members,
-                        f"data/exports/{group.replace('@', '').replace('/', '_')}",
-                        export_format
-                    )
+                    export_filename = f"data/exports/{group.replace('@', '').replace('/', '_')}"
+                    logger.info(f"💾 Attempting to export {len(members)} members to: {export_filename}")
+                    try:
+                        await self._export_members(members, export_filename, export_format)
+                        logger.info(f"✅ Successfully exported {len(members)} members")
+                    except Exception as export_error:
+                        logger.error(f"❌ Export failed: {export_error}")
+                        # Try to save as backup JSON
+                        try:
+                            import json
+                            backup_path = f"{export_filename}_backup.json"
+                            with open(backup_path, 'w', encoding='utf-8') as f:
+                                member_data = [m.to_dict() for m in members]
+                                json.dump(member_data, f, indent=2, ensure_ascii=False, default=str)
+                            logger.info(f"💾 Backup saved to: {backup_path}")
+                        except Exception as backup_error:
+                            logger.error(f"❌ Backup also failed: {backup_error}")
+                else:
+                    logger.warning(f"⚠️ No members to export for group: {group}")
 
                 # Delay between groups
                 if i < len(group_list):
@@ -390,22 +404,31 @@ class TelegramMemberScraper:
         format_type: str = "csv"
     ):
         """Export members to various formats"""
+        logger.info(f"🔧 Export function called: {len(members)} members, format: {format_type}")
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-        if format_type.lower() == "csv":
-            filename = f"{filename_base}_{timestamp}.csv"
-            await self._export_to_csv(members, filename)
+        try:
+            if format_type.lower() == "csv":
+                filename = f"{filename_base}_{timestamp}.csv"
+                logger.info(f"📄 Creating CSV file: {filename}")
+                await self._export_to_csv(members, filename)
 
-        elif format_type.lower() == "json":
-            filename = f"{filename_base}_{timestamp}.json"
-            await self._export_to_json(members, filename)
+            elif format_type.lower() == "json":
+                filename = f"{filename_base}_{timestamp}.json"
+                logger.info(f"📄 Creating JSON file: {filename}")
+                await self._export_to_json(members, filename)
 
-        elif format_type.lower() in ["xlsx", "excel"]:
-            filename = f"{filename_base}_{timestamp}.xlsx"
-            await self._export_to_excel(members, filename)
+            elif format_type.lower() in ["xlsx", "excel"]:
+                filename = f"{filename_base}_{timestamp}.xlsx"
+                logger.info(f"📄 Creating Excel file: {filename}")
+                await self._export_to_excel(members, filename)
 
-        logger.info(f"💾 Exported {len(members):,} members to {filename}")
+            logger.info(f"💾 Successfully exported {len(members):,} members to {filename}")
+
+        except Exception as e:
+            logger.error(f"❌ Export error in _export_members: {e}")
+            raise
 
     async def _export_to_csv(self, members: List[Member], filename: str):
         """Export members to CSV format"""
