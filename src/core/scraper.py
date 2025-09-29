@@ -220,8 +220,47 @@ class TelegramMemberScraper:
                     continue
 
                 except ChatAdminRequiredError:
-                    logger.error("❌ Admin privileges required to access member list")
-                    break
+                    logger.warning(f"⚠️ Admin privileges required to access full member list for {group.title}")
+                    logger.info("💡 Trying alternative approach: fetching recent participants only...")
+
+                    # Try with recent participants filter which sometimes works without admin
+                    try:
+                        participants = await self.client(GetParticipantsRequest(
+                            channel=entity,
+                            filter=ChannelParticipantsRecent(),
+                            offset=offset,
+                            limit=min(batch_size, max_members - scraped_count),
+                            hash=0
+                        ))
+
+                        if not participants.users:
+                            logger.warning("❌ No accessible members found - insufficient permissions")
+                            break
+
+                        # Process the accessible members
+                        for user in participants.users:
+                            if scraped_count >= max_members:
+                                break
+
+                            if user.deleted:
+                                continue
+
+                            member = await self._process_member(user, group)
+
+                            if not include_inactive and not member.is_active:
+                                continue
+
+                            scraped_count += 1
+                            yield member
+
+                            if scraped_count % 100 == 0:
+                                logger.info(f"📈 Scraped {scraped_count:,} members...")
+
+                        offset += len(participants.users)
+
+                    except Exception as e2:
+                        logger.error(f"❌ Alternative approach also failed: {e2}")
+                        break
 
                 except Exception as e:
                     logger.error(f"❌ Error in batch scraping: {e}")
@@ -373,17 +412,28 @@ class TelegramMemberScraper:
         Path(filename).parent.mkdir(parents=True, exist_ok=True)
 
         with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
-            fieldnames = [
-                'id', 'username', 'first_name', 'last_name', 'phone',
-                'bio', 'is_bot', 'is_premium', 'is_verified', 'is_active',
-                'last_seen', 'language_code', 'group_title', 'scraped_at'
-            ]
+            # Get all possible fieldnames from member dictionary
+            if members:
+                # Use the first member's dictionary keys as fieldnames
+                sample_dict = members[0].to_dict()
+                fieldnames = list(sample_dict.keys())
+            else:
+                # Fallback to basic fieldnames if no members
+                fieldnames = [
+                    'id', 'username', 'first_name', 'last_name', 'phone',
+                    'bio', 'is_bot', 'is_premium', 'is_verified', 'is_active',
+                    'last_seen', 'language_code', 'group_title', 'scraped_at'
+                ]
 
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
 
             for member in members:
-                writer.writerow(member.to_dict())
+                # Get member dict and ensure all fields are present
+                member_dict = member.to_dict()
+                # Fill missing fields with None/empty values
+                row_data = {field: member_dict.get(field, '') for field in fieldnames}
+                writer.writerow(row_data)
 
     async def _export_to_json(self, members: List[Member], filename: str):
         """Export members to JSON format"""
@@ -434,7 +484,15 @@ class TelegramMemberScraper:
 
         except ImportError:
             logger.warning("⚠️ pandas not available, falling back to CSV export")
-            await self._export_to_csv(members, filename.replace('.xlsx', '.csv'))
+            csv_filename = filename.replace('.xlsx', '.csv')
+            await self._export_to_csv(members, csv_filename)
+            logger.info(f"📄 Excel export not available - data saved as CSV: {csv_filename}")
+        except Exception as e:
+            logger.error(f"❌ Excel export failed: {e}")
+            logger.info("🔄 Falling back to CSV export...")
+            csv_filename = filename.replace('.xlsx', '.csv')
+            await self._export_to_csv(members, csv_filename)
+            logger.info(f"📄 Fallback successful - data saved as CSV: {csv_filename}")
 
     async def close(self):
         """Close the Telegram client"""
