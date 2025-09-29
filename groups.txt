@@ -1,18 +1,7 @@
-# Telegram Groups/Channels for Member Scraping
+# Target Groups for Member Scraping
 # Format: One group URL or username per line
-#
-# Examples:
-# https://t.me/example_group
-# @example_channel
-# example_group_username
-#
-# Add your target groups below:
 
-# Example groups (remove these and add your own):
-# @telegram
-# https://t.me/durov
-# @BotNews
-
-# Your target groups:
-# Add your groups here, one per line
-# Remove the # symbol to uncomment lines
+# Source groups to scrape members from:
+https://t.me/cari_temen_random_pacar
+https://t.me/friendwithbenefitbase
+https://t.me/fwbbase2

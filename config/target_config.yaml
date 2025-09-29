@@ -1,0 +1,49 @@
+# Configuration for Member Migration Operation
+# Target: https://t.me/+3_lpGQGGGeA2NWJl
+
+# Target group configuration
+target_group:
+  url: "https://t.me/+3_lpGQGGGeA2NWJl"
+  name: "Target Group"
+  operation: "member_invitation"
+
+# Source groups (for member scraping)
+source_groups:
+  - url: "https://t.me/cari_temen_random_pacar"
+    name: "Cari Temen Random Pacar"
+  - url: "https://t.me/friendwithbenefitbase"
+    name: "Friends with Benefit Base"
+  - url: "https://t.me/fwbbase2"
+    name: "FWB Base 2"
+
+# Scraping settings
+scraper_settings:
+  max_members_per_group: 500
+  delay_between_groups: 30  # seconds
+  delay_between_members: 2  # seconds
+
+# Member filtering
+member_filters:
+  active_only: true
+  exclude_bots: true
+  min_last_seen_days: 30
+  exclude_premium: false
+
+# Export settings
+export:
+  format: "excel"  # excel, csv, json
+  include_usernames: true
+  include_phone_numbers: false
+  include_profile_photos: false
+
+# Rate limiting (IMPORTANT for avoiding bans)
+rate_limiting:
+  requests_per_minute: 20
+  members_per_hour: 100
+  daily_limit: 500
+
+# Security settings
+security:
+  respect_privacy: true
+  check_permissions: true
+  log_all_actions: true
