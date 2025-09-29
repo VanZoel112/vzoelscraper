@@ -1,0 +1,23 @@
+# Sample Groups File for vzoelscraper
+# Copy this to groups.txt and modify with your target groups
+
+# Format options:
+# 1. Username format:
+@telegram
+@BotNews
+
+# 2. Full URL format:
+https://t.me/durov
+https://t.me/telegram
+
+# 3. Username without @:
+telegram_tips
+python_programming
+
+# Public channels (these are safe examples):
+@telegram
+@BotNews
+@durov
+
+# Note: Only add groups where you have permission to access members
+# Respect privacy and Telegram's Terms of Service
