@@ -358,9 +358,16 @@ class TelegramMemberScraper:
 
             try:
                 members = []
+                member_count = 0
                 async for member in self.scrape_group_members(group):
                     members.append(member)
+                    member_count += 1
 
+                    # Debug logging every 100 members
+                    if member_count % 100 == 0:
+                        logger.info(f"🔄 Collected {member_count} members so far in list...")
+
+                logger.info(f"📊 Final collection: {len(members)} members in list for {group}")
                 results[group] = len(members)
 
                 # Export group data

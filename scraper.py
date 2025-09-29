@@ -10,11 +10,12 @@ License: MIT
 
 import asyncio
 import argparse
+import importlib.util
 import sys
 import json
 import logging
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 from datetime import datetime
 
 try:
@@ -27,11 +28,13 @@ try:
 except ImportError:
     RICH_AVAILABLE = False
 
-from src.core.scraper import TelegramMemberScraper
 from src.core.analyzer import TelegramAnalyzer
-from src.utils.config import Config, setup_environment
 from src.models.member import Member
 from src.models.group import Group
+
+if TYPE_CHECKING:
+    from src.core.scraper import TelegramMemberScraper
+    from src.utils.config import Config
 
 # Setup logging
 logging.basicConfig(
@@ -44,6 +47,59 @@ logger = logging.getLogger(__name__)
 console = Console() if RICH_AVAILABLE else None
 
 
+def ensure_telethon_available() -> None:
+    """Ensure that the Telethon dependency is installed before scraping."""
+    if importlib.util.find_spec("telethon") is None:
+        message = (
+            "Telethon is required for scraping. Install dependencies with "
+            "'pip install -r requirements.txt'."
+        )
+        if console:
+            console.print(f"❌ [red]{message}[/red]")
+        else:
+            print(f"❌ {message}")
+        sys.exit(1)
+
+
+def ensure_yaml_available() -> None:
+    """Ensure that PyYAML is installed before using configuration features."""
+    if importlib.util.find_spec("yaml") is None:
+        message = (
+            "PyYAML is required for configuration features. Install dependencies with "
+            "'pip install -r requirements.txt'."
+        )
+        if console:
+            console.print(f"❌ [red]{message}[/red]")
+        else:
+            print(f"❌ {message}")
+        sys.exit(1)
+
+
+def setup_environment_directories() -> None:
+    """Create runtime directories without requiring optional dependencies."""
+    if importlib.util.find_spec("yaml") is not None:
+        from src.utils.config import setup_environment as _setup_environment
+
+        _setup_environment()
+        return
+
+    directories = [
+        Path("config"),
+        Path("data/exports"),
+        Path("data/logs"),
+        Path("data/cache"),
+        Path("data/sessions"),
+    ]
+
+    for directory in directories:
+        directory.mkdir(parents=True, exist_ok=True)
+
+    if console:
+        console.print("📁 [green]Environment directories created[/green]")
+    else:
+        print("📁 Environment directories created")
+
+
 class TelegramScraperCLI:
     """
     Command-line interface for Telegram Member Scraper
@@ -53,13 +109,19 @@ class TelegramScraperCLI:
     """
 
     def __init__(self):
-        self.config = None
-        self.scraper = None
+        self.config: Optional["Config"] = None
+        self.scraper: Optional["TelegramMemberScraper"] = None
         self.analyzer = TelegramAnalyzer()
 
     async def initialize(self, config_path: Optional[str] = None):
         """Initialize the scraper with configuration"""
         try:
+            ensure_telethon_available()
+            ensure_yaml_available()
+
+            from src.core.scraper import TelegramMemberScraper
+            from src.utils.config import Config
+
             self.config = Config(config_path)
             self.scraper = TelegramMemberScraper(config_path or "config/settings.yaml")
             await self.scraper.initialize()
@@ -398,10 +460,13 @@ Examples:
         logging.getLogger().setLevel(logging.WARNING)
 
     # Setup environment
-    setup_environment()
+    setup_environment_directories()
 
     # Handle setup command
     if args.setup:
+        ensure_yaml_available()
+        from src.utils.config import Config
+
         print("🔧 Setting up Telegram Member Scraper...")
         config = Config()
         print("✅ Setup completed! Please edit config/settings.yaml with your API credentials.")
@@ -411,27 +476,35 @@ Examples:
     cli = TelegramScraperCLI()
 
     try:
-        # Initialize scraper
-        await cli.initialize(args.config)
+        analyze_after_scrape = args.analyze is True
+        needs_scraper = bool(args.group or args.groups)
 
-        # Execute commands
-        if args.group:
-            await cli.scrape_single_group(
-                args.group,
-                limit=args.limit,
-                export_format=args.format,
-                analyze=bool(args.analyze)
-            )
+        if analyze_after_scrape and not needs_scraper:
+            parser.print_help()
 
-        elif args.groups:
-            await cli.scrape_multiple_groups(
-                args.groups,
-                export_format=args.format,
-                delay=args.delay,
-                analyze=bool(args.analyze)
-            )
+        elif needs_scraper:
+            await cli.initialize(args.config)
 
-        elif args.analyze and args.analyze != True:
+            if args.group:
+                await cli.scrape_single_group(
+                    args.group,
+                    limit=args.limit,
+                    export_format=args.format,
+                    analyze=bool(args.analyze)
+                )
+
+            elif args.groups:
+                await cli.scrape_multiple_groups(
+                    args.groups,
+                    export_format=args.format,
+                    delay=args.delay,
+                    analyze=bool(args.analyze)
+                )
+
+            else:
+                parser.print_help()
+
+        elif args.analyze and args.analyze is not True:
             await cli.analyze_data(args.analyze)
 
         else:
